@@ -42,7 +42,7 @@ class CenteredIntervalTree
     Node* root; /* Root of interval tree */
 
     /* Set of intervals used to construct interval tree */
-    std::vector<std::pair<double, double>> contained_intervals;
+    // std::vector<std::pair<double, double>> contained_intervals;
 }
 
 #endif
