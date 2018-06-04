@@ -1,25 +1,10 @@
 #include "CenteredIntervalTree.h"
 #include <iostream>
 #include <assert.h>
+#include <algorithm>
 
-std::vector<std::pair<double, double> > initVec ();
 void printVec (std::vector<std::pair<double, double> >& vec);
 void bigTest ();
-
-std::vector<std::pair<double, double> >
-initVec ()
-{
-  std::vector<std::pair<double, double> > vec;
-  vec.push_back (std::make_pair (9, 20));
-  vec.push_back (std::make_pair (5, 30));
-  vec.push_back (std::make_pair (0, 20));
-  vec.push_back (std::make_pair (6, 15));
-  vec.push_back (std::make_pair (11, 40));
-  vec.push_back (std::make_pair (0, 12));
-  vec.push_back (std::make_pair (1, 7));
-  vec.push_back (std::make_pair (2, 34));
-  return vec;
-}
 
 void
 printVec (std::vector<std::pair<double, double> >& vec)
@@ -66,12 +51,15 @@ bigTest ()
     result = cit.pointSearch (a);
     std::unordered_set<int> check;
     for (int j = 0; j < stored_intervals.size (); j++) {
-      if (stored_intervals[j].first <= a || stored_intervals[j].second >= a) {
+      if (stored_intervals[j].first <= a && stored_intervals[j].second >= a) {
         check.insert (j);
       }
     }
     if (result != check) {
       std::cout << "Got an error with Point Searching Test." << std::endl;
+      std::cout << "Result size: " << result.size () << std::endl;
+      std::cout << "Check size: " << check.size () << std::endl;
+      std::cout << std::endl;
     }
   }
 
@@ -103,20 +91,5 @@ bigTest ()
 }
 
 int main () {
-  // std::vector<std::pair<double, double> > vec = initVec ();
-  // printVec (vec);
-  // CenteredIntervalTree cit (vec);
-  // std::unordered_set<int> overlaps = cit.pointSearch (15);
-  //
-  // cit.printTree ();
-  //
-  // std::vector<std::pair<double, double> > intervals = cit.returnIntervals (overlaps);
-  // std::cout << "Printing out results from Point Search 15" << std::endl;
-  // printVec (intervals);
-  //
-  // std::unordered_set<int> overlaps2 = cit.intervalSearch (std::make_pair (1, 7));
-  // std::vector<std::pair<double, double> > intervals2 = cit.returnIntervals (overlaps2);
-  // std::cout << "Printing out results from Interval Search (1, 7)" << std::endl;
-  // printVec (intervals2);
   bigTest ();
 }

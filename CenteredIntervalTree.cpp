@@ -172,11 +172,19 @@ CenteredIntervalTree::findStartIndex (double start, int left, int right)
   if (right >= left) {
     int mid = left + (right - left)/2;
     int next = mid + 1;
+
+    /* Go as far back as possible to reach first occurrence
+       of element similar to start point */
+    while (start == combined_points[mid].first) {
+      mid -= 1;
+      next -= 1;
+    }
+
     if (start >= combined_points[mid].first && start <= combined_points[next].first) {
       return next;
     }
     if (start < combined_points[mid].first) {
-      return findStartIndex (start, left, mid - 1);
+      return findStartIndex (start, left, mid);
     }
     if (start > combined_points[next].first) {
       return findStartIndex (start, next, right);
@@ -192,11 +200,17 @@ CenteredIntervalTree::findEndIndex (double end, int left, int right)
   if (right >= left) {
     int mid = left + (right - left)/2;
     int next = mid + 1;
+
+    while (end == combined_points[next].first) {
+      next += 1;
+      mid += 1;
+    }
+
     if (end >= combined_points[mid].first && end <= combined_points[next].first) {
       return mid;
     }
     if (end < combined_points[mid].first) {
-      return findEndIndex (end, left, mid - 1);
+      return findEndIndex (end, left, mid);
     }
     if (end > combined_points[next].first) {
       return findEndIndex (end, next, right);
@@ -210,9 +224,9 @@ std::unordered_set<int>
 CenteredIntervalTree::intervalSearch (std::pair<double, double> interval)
 {
   std::unordered_set<int> overlaps;
-  int q_start = findStartIndex (interval.first, 0, combined_points.size ());
+  int q_start = findStartIndex (interval.first, 0, combined_points.size () - 1);
   if (q_start == combined_points.size ()) return overlaps;  // no intervals can contain this point
-  int q_end = findEndIndex (interval.second, 0, combined_points.size ());
+  int q_end = findEndIndex (interval.second, 0, combined_points.size () - 1);
   if (q_end == -1) return overlaps; // no intervals can contain this point
 
   double query_point = (interval.first + interval.second) / 2;
