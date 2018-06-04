@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <iostream>
 
+/* Comparator function for sorting containers with
+   pair<T, T> elements */
 bool
 sortBySec (const std::pair<double, double>& a,
            const std::pair<double, double>& b)
@@ -29,13 +31,10 @@ CenteredIntervalTree::CenteredIntervalTree (const std::vector<std::pair<double, 
   }
   std::sort (combined_points.begin (), combined_points.end ());
 
-  // std::cout << "HELLO" << std::endl;
-  // printPairVec (contained_intervals);
-  // printPairVec (combined_points);
-
   root = buildTree (sorted_tuple_ends);
 }
 
+/* Returns a new node for the tree */
 CenteredIntervalTree::Node*
 CenteredIntervalTree::newNode(double key, Node *left, Node *right,
                               std::vector<std::tuple<double, double, int> >& sorted_starts,
@@ -55,7 +54,6 @@ CenteredIntervalTree::newNode(double key, Node *left, Node *right,
 CenteredIntervalTree::Node*
 CenteredIntervalTree::buildTree (std::vector<std::tuple<double, double, int> >& sorted_ends)
 {
-  // printTupleVec (sorted_ends);
   if (sorted_ends.size () == 0) {
     return nullptr;
   }
@@ -65,9 +63,7 @@ CenteredIntervalTree::buildTree (std::vector<std::tuple<double, double, int> >& 
   }
 
   unsigned median = sorted_ends.size ()/2;
-  // std::cout << "Printing Median: " << median << std::endl;
   double key = std::get<1> (sorted_ends[median]);  // median
-  // std::cout << "Printing Median Value: " << key << std::endl;
 
   /* Find the intervals that contain the key and separate from ones that don't */
   std::vector<std::tuple<double, double, int> > left_elems;
@@ -80,13 +76,13 @@ CenteredIntervalTree::buildTree (std::vector<std::tuple<double, double, int> >& 
       in_range_intervals.push_back (sorted_ends[i]);
       continue;
     }
-    if (start > key) right_elems.push_back (sorted_ends[i]);
-    if (end < key) left_elems.push_back (sorted_ends[i]);
+    else if (start > key) right_elems.push_back (sorted_ends[i]);
+    else if (end < key) left_elems.push_back (sorted_ends[i]);
   }
 
-  /* Create the sorted array by start values */
+  /* Create the array sorted by start values */
   std::vector<std::tuple<double, double, int> > sorted_starts (in_range_intervals.begin (),
-                                                        in_range_intervals.end ());
+                                                               in_range_intervals.end ());
   std::sort (sorted_starts.begin (), sorted_starts.end ());
 
   return newNode (key, buildTree (left_elems), buildTree (right_elems),
@@ -112,6 +108,7 @@ CenteredIntervalTree::~CenteredIntervalTree () {
   }
 }
 
+/* Helper function for performing a point query */
 void
 CenteredIntervalTree::pointSearchHelper (Node* rootNode, double point, std::unordered_set<int>& intervals)
 {
@@ -166,6 +163,8 @@ CenteredIntervalTree::pointSearch (double point)
   return intervals;
 }
 
+/* Looks for the index of the first element in a sorted array that is
+   greater than or equal to start point */
 int
 CenteredIntervalTree::findStartIndex (double start, int left, int right)
 {
@@ -194,6 +193,8 @@ CenteredIntervalTree::findStartIndex (double start, int left, int right)
   return left;
 }
 
+/* Looks for the index of the last element of a sorted array
+   that is less than or equal to end point */
 int
 CenteredIntervalTree::findEndIndex (double end, int left, int right)
 {
@@ -229,6 +230,8 @@ CenteredIntervalTree::intervalSearch (std::pair<double, double> interval)
   int q_end = findEndIndex (interval.second, 0, combined_points.size () - 1);
   if (q_end == -1) return overlaps; // no intervals can contain this point
 
+  /* Pick a point inside of the requested interval.
+     Perform point query on that chosen point. */
   double query_point = (interval.first + interval.second) / 2;
   pointSearchHelper (root, query_point, overlaps);
 
@@ -239,6 +242,8 @@ CenteredIntervalTree::intervalSearch (std::pair<double, double> interval)
   return overlaps;
 }
 
+/* Returns the intervals corresponding to the indices provided by
+   the unordered set 'overlaps'. */
 std::vector<std::pair<double, double> >
 CenteredIntervalTree::returnIntervals (std::unordered_set<int>& overlaps)
 {
