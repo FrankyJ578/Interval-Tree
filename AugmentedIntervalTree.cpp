@@ -3,6 +3,7 @@
 #include <iostream>
 #include <random>
 #include <assert.h>
+#include "Timer.h"
 using namespace std;
 
 struct Interval {
@@ -484,6 +485,7 @@ void bigTest() {
   Node *result;
   vector<Node *> results;
   double a, b;
+  Timer insertTimer, pointQueryTimer, intervalQueryTimer;
 
   cout << "==========================" << endl;
   cout << "===== Automated Test =====" << endl;
@@ -498,8 +500,13 @@ void bigTest() {
     interval.start = (a >= b) ? b: a;
     interval.end = (a >= b) ? a : b;
     intervals.push_back(interval);
+
+    insertTimer.start();
     root = insert(root, interval);
+    insertTimer.stop();
   }
+
+  cout << "Insert Timer = " << insertTimer.elapsed() / numInsertElement << endl;
 
   for (int i = 0; i < numPointQueryElement; i++) {
     a = (double) (rand()%100001);
@@ -512,6 +519,7 @@ void bigTest() {
       }
     }
   }
+
   cout << "Point Query Test: PASS!!!" << endl;
 
   for (int i = 0; i < numIntervalQueryElement; i++) {
@@ -529,11 +537,14 @@ void bigTest() {
       }
     }
   }
+
   cout << "Interval Query Test: PASS!!!" << endl;
 
   for (int i = 0; i < numPointQueryElement; i++) {
     a = (double) (rand()%100001);
+    pointQueryTimer.start ();
     results = pointQueryAll(root, a);
+    pointQueryTimer.stop ();
     for (int j = 0; j < results.size(); j++) {
       assert(results[j]->interval->start <= a && results[j]->interval->end >= a);
     }
@@ -544,6 +555,8 @@ void bigTest() {
     }
     assert(results.size() == numResult);
   }
+
+  cout << "Point Query Timer = " << pointQueryTimer.elapsed() / numPointQueryElement << endl;
   cout << "Point Query All Test: PASS!!!" << endl;
 
   for (int i = 0; i < numIntervalQueryElement; i++) {
@@ -551,7 +564,9 @@ void bigTest() {
     b = (double) (rand()%100001);
     interval.start = (a >= b) ? b: a;
     interval.end = (a >= b) ? a : b;
+    intervalQueryTimer.start();
     results = intervalQueryAll(root, interval);
+    intervalQueryTimer.stop();
 
     for (int j = 0; j < results.size(); j++) {
       assert(isOverlap(interval, *(results[j]->interval)));
@@ -563,11 +578,13 @@ void bigTest() {
     }
     assert(results.size() == numResult);
   }
+
+  cout << "Interval Query Timer = " << intervalQueryTimer.elapsed() / numIntervalQueryElement << endl;
   cout << "Interval Query All Test: PASS!!!" << endl;
 }
 
 int main() {
-  smallTest();
+  // smallTest();
   bigTest();
   return 0;
 }
