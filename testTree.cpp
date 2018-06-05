@@ -74,10 +74,13 @@ bigTest ()
     std::unordered_set<int> check;
 
     for (int j = 0; j < stored_intervals.size (); j++) {
-      if (stored_intervals[j].first <= interval.first && stored_intervals[j].second >= interval.first) {
-        check.insert (j);
-      }
-      else if (stored_intervals[j].first > interval.first && stored_intervals[j].first <= interval.second) {
+      // if (stored_intervals[j].first <= interval.first && stored_intervals[j].second >= interval.first) {
+      //   check.insert (j);
+      // }
+      // else if (stored_intervals[j].first > interval.first && stored_intervals[j].first <= interval.second) {
+      //   check.insert (j);
+      // }
+      if (stored_intervals[j].first <= interval.second && interval.first <= stored_intervals[j].second) {
         check.insert (j);
       }
     }

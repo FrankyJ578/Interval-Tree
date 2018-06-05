@@ -2,6 +2,7 @@
 #include <stack>
 #include <unordered_set>
 #include <functional>
+#include <algorithm>
 
 using namespace std;
 
@@ -257,10 +258,11 @@ DynamicIntervalTree::insertIntervalRecurse(Node *node, Interval interval) {
 }
 
 void DynamicIntervalTree::insertInterval(Interval interval) {
-  int index = findStartIndex (interval.start, 0, combined_points.size());
+  int index = findStartIndex (interval.start, 0, combined_points.size() - 1);
   combined_points.insert (combined_points.begin () + index, make_pair(interval.start, interval));
-  index = findEndIndex (interval.end, 0, combined_points.size());
-  combined_points.insert (combined_points.begin() + index, make_pair(interval.end, interval));
+  index = findEndIndex (interval.end, 0, combined_points.size() - 1);
+  combined_points.insert (combined_points.begin() + index + 1, make_pair(interval.end, interval));
+
   if (root == NULL) {
     root = newNode(interval);
     return;
@@ -292,16 +294,9 @@ void DynamicIntervalTree::removeInterval(Interval interval) {
   if (root == NULL) return;
 
   // Remove from the array of starts and ends
-  int index = findStartIndex (interval.start, 0, combined_points.size ());
-  while (combined_points[index].first == interval.start && !(combined_points[index].second == interval)) {
-    index += 1;
-  }
+  int index = findStartIndex (interval.start, 0, combined_points.size () - 1);
   combined_points.erase(combined_points.begin() + index);
-
-  index = findEndIndex (interval.end, 0, combined_points.size ());
-  while (combined_points[index].first == interval.end && !(combined_points[index].second == interval)) {
-    index -= 1;
-  }
+  index = findEndIndex (interval.end, 0, combined_points.size () - 1);
   combined_points.erase(combined_points.begin() + index);
 
   if (interval.start <= root->center && root->center <= interval.end) {
@@ -350,10 +345,12 @@ DynamicIntervalTree::findStartIndex (double start, int left, int right)
 
     /* Go as far back as possible to reach first occurrence
        of element similar to start point */
-    while (start == combined_points[mid].first) {
+    while (mid >= 0 && start == combined_points[mid].first) {
       mid -= 1;
       next -= 1;
     }
+
+    // if (next >= combined_points.size()) return left;
 
     if (start >= combined_points[mid].first && start <= combined_points[next].first) {
       return next;
@@ -378,10 +375,12 @@ DynamicIntervalTree::findEndIndex (double end, int left, int right)
     int mid = left + (right - left)/2;
     int next = mid + 1;
 
-    while (end == combined_points[next].first) {
+    while (next < combined_points.size() && end == combined_points[next].first) {
       next += 1;
       mid += 1;
     }
+
+    // if (next >= combined_points.size()) return left;
 
     if (end >= combined_points[mid].first && end <= combined_points[next].first) {
       return mid;
@@ -411,6 +410,7 @@ vector<DynamicIntervalTree::Interval> DynamicIntervalTree::intervalQuery(Interva
   for (int i=q_start; i <= q_end; i++) {
     no_duplicates.insert (combined_points[i].second);
   }
+
   for (int i = 0; i < vec.size(); i++) {
     no_duplicates.insert (vec[i]);
   }
