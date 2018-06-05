@@ -475,17 +475,17 @@ void smallTest() {
 }
 
 
-void bigTest() {
+void test(int numIntervals) {
   Node *root = NULL;
-  int numInsertElement = 10000;
-  int numPointQueryElement = 10000;
-  int numIntervalQueryElement = 10000;
+  int numInsertElement = numIntervals;
+  int numPointQueryElement = numIntervals;
+  int numIntervalQueryElement = numIntervals;
   vector<Interval> intervals;
   Interval interval;
   Node *result;
   vector<Node *> results;
   double a, b;
-  Timer insertTimer, pointQueryTimer, intervalQueryTimer;
+  Timer insertTimer, deleteTimer, pointQueryTimer, intervalQueryTimer;
 
   cout << "==========================" << endl;
   cout << "===== Automated Test =====" << endl;
@@ -581,10 +581,25 @@ void bigTest() {
 
   cout << "Interval Query Timer = " << intervalQueryTimer.elapsed() / numIntervalQueryElement << endl;
   cout << "Interval Query All Test: PASS!!!" << endl;
+
+  for (int i = 0; i < numIntervals/10; i++) {
+    int index = (int) (rand()%(intervals.size()-1));
+    // std::cout << "Element to remove: " << intervals[index].start << " "
+    //           << intervals[index].end << std::endl;
+    interval = intervals[index];
+    deleteTimer.start ();
+    root = deleteNode (root, interval);
+    deleteTimer.stop ();
+    intervals.erase (intervals.begin() + index);
+  }
+
+  std::cout << "Delete Timer = " << deleteTimer.elapsed () / (numIntervals/10) << std::endl;
 }
 
 int main() {
   // smallTest();
-  bigTest();
+  test(1000);
+  test(10000);
+  test(25000);
   return 0;
 }

@@ -345,7 +345,7 @@ DynamicIntervalTree::findStartIndex (double start, int left, int right)
 
     /* Go as far back as possible to reach first occurrence
        of element similar to start point */
-    while (mid >= 0 && start == combined_points[mid].first) {
+    while (start == combined_points[mid].first) {
       mid -= 1;
       next -= 1;
     }
@@ -375,7 +375,7 @@ DynamicIntervalTree::findEndIndex (double end, int left, int right)
     int mid = left + (right - left)/2;
     int next = mid + 1;
 
-    while (next < combined_points.size() && end == combined_points[next].first) {
+    while (end == combined_points[next].first) {
       next += 1;
       mid += 1;
     }
@@ -452,4 +452,8 @@ void DynamicIntervalTree::preOrderRecurse(Node *node) {
 
 void DynamicIntervalTree::preOrder() {
   preOrderRecurse(root);
+}
+
+vector<pair<double, DynamicIntervalTree::Interval> > DynamicIntervalTree::getArray() {
+  return combined_points;
 }

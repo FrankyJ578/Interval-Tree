@@ -38,6 +38,8 @@ class DynamicIntervalTree {
 
     void preOrder();
 
+    vector<std::pair<double, Interval> > getArray(void);
+
   private:
 
     Node *root;

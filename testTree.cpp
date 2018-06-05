@@ -2,6 +2,7 @@
 #include <iostream>
 #include <assert.h>
 #include <algorithm>
+#include "Timer.h"
 
 void printVec (std::vector<std::pair<double, double> >& vec);
 void bigTest ();
@@ -17,16 +18,17 @@ printVec (std::vector<std::pair<double, double> >& vec)
 }
 
 void
-bigTest ()
+test (int numIntervals)
 {
-  int numInsertElement = 10000;
-  int numPointQueryElement = 10000;
-  int numIntervalQueryElement = 10000;
+  int numInsertElement = numIntervals;
+  int numPointQueryElement = numIntervals;
+  int numIntervalQueryElement = numIntervals;
   std::vector<std::pair<double, double> > intervals;
   std::pair<double, double> interval;
   std::vector<std::pair<double, double> > stored_intervals;
   std::unordered_set<int> result;
   double a, b;
+  Timer pointTimer, intervalTimer;
 
   std::cout << "==========================" << std::endl;
   std::cout << "===== Automated Test =====" << std::endl;
@@ -48,7 +50,9 @@ bigTest ()
 
   for (int i = 0; i < numPointQueryElement; i++) {
     a = (double) (rand () % 100001);
+    pointTimer.start();
     result = cit.pointSearch (a);
+    pointTimer.stop();
     std::unordered_set<int> check;
     for (int j = 0; j < stored_intervals.size (); j++) {
       if (stored_intervals[j].first <= a && stored_intervals[j].second >= a) {
@@ -63,6 +67,7 @@ bigTest ()
     }
   }
 
+  std::cout << "Point Timer = " << pointTimer.elapsed() / numPointQueryElement << std::endl;
   std::cout << "Point Query Test: PASS!!!" << std::endl;
 
   for (int i = 0; i < numIntervalQueryElement; i++) {
@@ -70,7 +75,9 @@ bigTest ()
     b = (double) (rand () % 100001);
     interval.first = (a >= b) ? b : a;
     interval.second = (a >= b) ? a : b;
+    intervalTimer.start();
     result = cit.intervalSearch (interval);
+    intervalTimer.stop();
     std::unordered_set<int> check;
 
     for (int j = 0; j < stored_intervals.size (); j++) {
@@ -90,9 +97,12 @@ bigTest ()
     }
   }
 
+  std::cout << "Interval Timer = " << intervalTimer.elapsed() / numIntervalQueryElement << std::endl;
   std::cout << "Interval Query All Test: PASS!!!" << std::endl;
 }
 
 int main () {
-  bigTest ();
+  test (1000);
+  test (10000);
+  test (25000);
 }
